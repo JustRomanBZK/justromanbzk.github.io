@@ -1,0 +1,204 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #2A2A2A;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #fff;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.container h1 {
+  margin-bottom: 0.2em;
+}
+
+#description {
+  margin-top: 0.5em;
+  color: #fff;
+  font-size: 16px;
+}
+
+#decoderForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#encodedString {
+  background: none;
+  border: 2px solid #6B6B6B;
+  color: #fff;
+  font-size: 18px;
+  padding: 15px;
+  border-radius: 5px;
+  width: 800px;
+  height: 400px;
+  margin-bottom: 20px;
+  overflow-y: auto;
+  resize: none;
+  outline: none;
+}
+
+#encodedString::placeholder {
+  color: #6B6B6B;
+}
+
+#decryptButton {
+  background-color: #26bbff;
+  border: none;
+  color: #fff;
+  padding: 15px 30px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 20px;
+  box-shadow: 0px 0px 10px 2px #26bbff;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  outline: none;
+  width: 140px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#decryptButton:hover {
+  background-color: #1a8fd8;
+}
+
+#decryptButton:active {
+  background-color: #0f6cb0;
+  transform: scale(0.95);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 140px;
+  height: 50px;
+  margin-bottom: 20px;
+  margin-top: 2em;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #26bbff;
+  -webkit-transition: .4s;
+  transition: .4s;
+  box-shadow: 0 0 10px #26bbff;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 42px;
+  width: 42px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  box-shadow: 0 0 10px #26bbff;
+}
+
+input:checked + .slider {
+  background-color: #26bbff;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(88px);
+  -ms-transform: translateX(88px);
+  transform: translateX(88px);
+  box-shadow: 0 0 10px #26bbff;
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+#switchState {
+  position: absolute;
+  top: 50%;
+  left: 65%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+  font-weight: bold;
+  user-select: none;
+  transition: left 0.4s;
+}
+
+input:checked + .slider #switchState {
+  left: 35%;
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(2px, 0);
+  }
+
+  20% {
+    transform: translate(-2px, 0);
+  }
+
+  40% {
+    transform: translate(2px, 0);
+  }
+
+  60% {
+    transform: translate(-2px, 0);
+  }
+
+  80% {
+    transform: translate(2px, 0);
+  }
+
+  100% {
+    transform: translate(-2px, 0);
+  }
+}
+
+#encodedString.error {
+  border-color: #cc0000;
+  animation: shake 0.5s;
+  animation-iteration-count: 1;
+}
+
+#error {
+  color: #cc0000;
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  font-size: 0.8em;
+}
+
+.input-container {
+  position: relative;
+}
+
+   /* Hello there */
