@@ -1,9 +1,33 @@
+<!DOCTYPE html>
 <html>
 
+<head>
+  <title>XAL Encode/Decode</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; child-src 'none';">
+  <script src="encoderDecoder.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
 <body>
-  <h1>YOUR NAME</h1>
-  <p>Welcome to my website!</p>
-  <img src="https://content.codecademy.com/articles/github-pages-via-web-app/happy-ice-cream.gif" />
+  <div class="container">
+    <h1>Epic Games "XAL" Token Decoder</h1>
+    <p id="description">A user-friendly interface for encoding and decoding Epic Games XAL tokens, all locally in your
+      browser using JavaScript.</p>
+    <label class="switch">
+      <input type="checkbox" id="toggleSwitch" checked>
+      <span class="slider round">
+        <span id="switchState">DECODE</span>
+      </span>
+    </label>
+    <form id="decoderForm">
+      <div class="input-container">
+        <textarea id="encodedString" name="encodedString"
+          placeholder="Please enter your XAL token or decoded JSON string..."></textarea>
+        <div id="error"></div>
+      </div>
+      <button type="button" id="decryptButton">Decode</button>
+    </form>
+  </div>
 </body>
 
 </html>
