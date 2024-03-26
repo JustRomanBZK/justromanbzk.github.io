@@ -1,153 +1,69 @@
-/**
- * Encryption key used for encoding and decoding operations.
- * @type {string}
- */
-const ENCRYPTION_KEY = "\x030é\b7°\x94\x0E-³x\x9DûËfîâÀ\x0EZâ©\x04\x9CSÑä`\x88\x9CÁ'"
-
-class EncoderDecoder {
-
-  /**
-   * Encodes a JSON string using XOR encryption.
-   * 
-   * @param {string} input - The JSON string to encode.
-   * @returns {string} - The encoded string.
-   * @throws {Error} - If the input is not a valid JSON string or exceeds 50000 characters.
-   */
-  encode(input) {
-    try {
-      JSON.parse(input);
-    } catch (error) {
-      throw new Error('Input to encode must be a valid JSON string');
-    }
-    if (input.length > 50000) {
-      throw new Error('Input to encode must be less than or equal to 50000 characters');
-    }
-
-    let stringifiedJson = unescape(encodeURIComponent(input));
-    let xal = Array.from(stringifiedJson).map((char, i) => {
-      let encodedCharcode = char.charCodeAt(0) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length);
-      return '0'.concat((255 & encodedCharcode).toString(16)).slice(-2);
-    }).join('');
-    return xal;
-  }
-
-  /**
-   * Decodes a string using a custom encryption algorithm.
-   * 
-   * @param {string} input - The string to be decoded.
-   * @returns {object} - The decoded object.
-   * @throws {Error} - If the input is not a string, contains non-alphanumeric characters,
-   *                   has an odd number of characters, or exceeds the maximum length of 50000 characters.
-   */
-  decode(input) {
-    if (typeof input !== 'string') {
-      throw new Error('Input to decode must be a string');
-    }
-
-    if (!/^[a-zA-Z0-9]+$/.test(input)) {
-      throw new Error('Input to decode must be alphanumeric');
-    }
-
-    if (input.length % 2 !== 0) {
-      throw new Error('Input to decode must have an even number of characters');
-    }
-
-    if (input.length > 50000) {
-      throw new Error('Input to decode must be less than or equal to 50000 characters');
-    }
-
-    let stringifiedJson = Array.from(input.match(/.{1,2}/g)).map((hexByte, i) => {
-      let encodedCharcode = parseInt(hexByte, 16);
-      let originalCharcode = encodedCharcode ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length);
-      return String.fromCharCode(originalCharcode);
-    }).join('');
-
-    let decodedXal;
-    try {
-      decodedXal = JSON.parse(decodeURIComponent(escape(stringifiedJson)));
-    } catch (error) {
-      throw error;
-    }
-    return decodedXal;
-  }
+// Функции для кодирования в base64 и декодирования из base64
+function b64encode(str) {
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) => String.fromCharCode('0x' + p1)));
 }
 
-document.addEventListener('DOMContentLoaded', (event) => {
+function b64decode(str) {
+    return decodeURIComponent(atob(str).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+}
 
-  window.onload = function() {
-    const toggleSwitch = document.getElementById('toggleSwitch');
-    const button = document.getElementById('decryptButton');
-    const switchState = document.getElementById('switchState');
-
-    if (toggleSwitch.checked) {
-      button.textContent = 'Decode';
-      switchState.textContent = 'DECODE';
-    } else {
-      button.textContent = 'Encode';
-      switchState.textContent = 'ENCODE';
-    }
-  };
-
-  document.getElementById('toggleSwitch').addEventListener('change', function() {
-    const button = document.getElementById('decryptButton');
-    const switchState = document.getElementById('switchState');
-    if (this.checked) {
-      button.textContent = 'Decode';
-      switchState.textContent = 'DECODE';
-    } else {
-      button.textContent = 'Encode';
-      switchState.textContent = 'ENCODE';
-    }
-  });
-
-  document.getElementById('decryptButton').addEventListener('click', function() {
-    const toggleSwitch = document.getElementById('toggleSwitch');
-    const encodedString = document.getElementById('encodedString');
-    const error = document.getElementById('error');
-    const encoderDecoder = new EncoderDecoder();
-    let result;
-
-    if (toggleSwitch.checked) {
-      if (!/^[a-fA-F0-9]+$/.test(encodedString.value.trim())) {
-        displayError(encodedString, error, '* Invalid XAL token. Please check your input and try again.');
-        return;
-      }
-    } else {
-      try {
-        JSON.parse(encodedString.value);
-      } catch (e) {
-        displayError(encodedString, error, '* Invalid JSON string. Please check your input and try again.');
-        return;
-      }
+class EncoderDecoder {
+    constructor() {
+        this.key = 'FZ\x99MÛSê/\x96·V«xÞh\x90í¢³4<`ô2\x98ª,µ¦Y\x9Bû';
     }
 
-    try {
-      if (toggleSwitch.checked) {
-        result = encoderDecoder.decode(encodedString.value);
-      } else {
-        let json = JSON.parse(encodedString.value);
-        result = encoderDecoder.encode(JSON.stringify(json));
-      }
+    // Алгоритм шифрования RC4
+    rc4(data) {
+        let s = [];
+        let j = 0;
+        let result = '';
+        for (let i = 0; i < 256; i++) {
+            s[i] = i;
+        }
 
-      encodedString.value = typeof result === 'object' ? JSON.stringify(result, null, 2) : result;
-      encodedString.classList.remove('error');
-      error.style.display = 'none';
-    } catch (error) {
-      displayError(encodedString, error, '* An error occurred during encoding/decoding. Please check your input and try again.');
+        for (let i = 0; i < 256; i++) {
+            j = (j + s[i] + this.key.charCodeAt(i % this.key.length)) % 256;
+            [s[i], s[j]] = [s[j], s[i]];
+        }
+
+        let i = 0;
+        j = 0;
+        for (let char of data) {
+            i = (i + 1) % 256;
+            j = (j + s[i]) % 256;
+            [s[i], s[j]] = [s[j], s[i]];
+            result += String.fromCharCode(char.charCodeAt(0) ^ s[(s[i] + s[j]) % 256]);
+        }
+
+        return result;
     }
-  });
 
-  /**
-   * Displays an error message and applies error styling to the encoded string element.
-   * @param {HTMLElement} encodedString - The element representing the encoded string.
-   * @param {HTMLElement} error - The element where the error message will be displayed.
-   * @param {string} message - The error message to be displayed.
-   */
-  function displayError(encodedString, error, message) {
-    encodedString.classList.remove('error');
-    void encodedString.offsetWidth;
-    encodedString.classList.add('error');
-    error.textContent = message;
-    error.style.display = 'block';
-  }
-});
+    encode(input) {
+        try {
+            JSON.parse(input);
+        } catch (error) {
+            throw new Error('Input to encode must be a valid JSON string');
+        }
+        if (input.length > 50000) {
+            throw new Error('Input to encode must be less than or equal to 50000 characters');
+        }
+
+        const rc4Encrypted = this.rc4(input);
+        return b64encode(rc4Encrypted);
+    }
+
+    decode(input) {
+        if (input.length > 50000) {
+            throw new Error('Input to decode must be less than or equal to 50000 characters');
+        }
+
+        const rc4Decrypted = this.rc4(b64decode(input));
+        try {
+            return JSON.parse(rc4Decrypted);
+        } catch (error) {
+            throw new Error('Failed to decode input. Make sure it is correctly encoded.');
+        }
+    }
+}
+
+// Используйте этот обновленный класс EncoderDecoder в вашем коде как и раньше.
